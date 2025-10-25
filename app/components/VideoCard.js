@@ -6,6 +6,7 @@ export default function VideoCard({ video }) {
           src={video.src}
           title={video.title}
           className="w-full h-full"
+          allow="fullscreen"
           allowFullScreen
         />
       </div>
