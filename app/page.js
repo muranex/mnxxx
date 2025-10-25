@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import VideoCard from './components/VideoCard';
 import CategoryFilter from './components/CategoryFilter';
-import videosData from './data/videos.json';
+import videosData from './data/videos.js';
 
 export default function Home() {
   const [videos, setVideos] = useState([]);
