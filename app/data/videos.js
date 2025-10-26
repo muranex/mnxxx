@@ -26,7 +26,7 @@ export default {
     src: 'https://www.pornhub.com/embed/643e96155abb8',
     title: 'Curvy Teacher Valentina Nappi Gets Fucked By Three Students In A Classroom - FreeUse Fantasy',
     description: 'Curvy Teacher Valentina Nappi Gets Fucked By Three Students In A Classroom - FreeUse Fantasy',
-    category: 'Teacher',
+    category: 'teacher',
   },
   {
     id: '5',
