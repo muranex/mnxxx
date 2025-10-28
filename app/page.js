@@ -12,7 +12,12 @@ import Stats from './components/Stats';
 import Footer from './components/Footer';
 import RecentlyViewed, { useRecentlyViewed } from './components/RecentlyViewed';
 import QuickActions from './components/QuickActions';
+import HotBanner from './components/HotBanner';
+import RandomVideo from './components/RandomVideo';
+import AdvancedFilters from './components/AdvancedFilters';
 import { useFavorites } from './components/Favorites';
+import { useWatchLater } from './components/WatchLater';
+import { useVideoRatings } from './components/VideoRating';
 import videosData from './data/videos.js';
 
 export default function Home() {
@@ -27,8 +32,11 @@ export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [advancedFilters, setAdvancedFilters] = useState({});
   const { favorites, toggleFavorite, clearFavorites } = useFavorites();
   const { recentlyViewed, addToRecentlyViewed, clearRecentlyViewed } = useRecentlyViewed();
+  const { watchLater, toggleWatchLater } = useWatchLater();
+  const { ratings, rateVideo } = useVideoRatings();
 
   useEffect(() => {
     setTimeout(() => {
@@ -60,6 +68,11 @@ export default function Home() {
         video.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
         video.category.toLowerCase().includes(searchTerm.toLowerCase())
       );
+    }
+
+    // Apply advanced filters
+    if (advancedFilters.minRating) {
+      filtered = filtered.filter(video => (ratings[video.id] || 0) >= parseInt(advancedFilters.minRating));
     }
 
     // Sort videos
@@ -108,21 +121,28 @@ export default function Home() {
       />
       
       <div className="container mx-auto px-4 py-8">
-        <Stats 
-          totalVideos={videos.length}
-          filteredVideos={filteredVideos.length}
-          categories={categories}
-        />
-        
         <SearchBar searchTerm={searchTerm} onSearchChange={setSearchTerm} />
         
         <RecentlyViewed videos={recentlyViewed} onVideoClick={openModal} />
         
-        <QuickActions 
-          onClearFavorites={clearFavorites}
-          onClearHistory={clearRecentlyViewed}
-          favoritesCount={favorites.length}
-          historyCount={recentlyViewed.length}
+        <div className="flex items-center justify-between mb-6">
+          <Stats 
+            totalVideos={videos.length}
+            filteredVideos={filteredVideos.length}
+            categories={categories}
+          />
+          
+          <QuickActions 
+            onClearFavorites={clearFavorites}
+            onClearHistory={clearRecentlyViewed}
+            favoritesCount={favorites.length}
+            historyCount={recentlyViewed.length}
+          />
+        </div>
+        
+        <AdvancedFilters 
+          filters={advancedFilters}
+          onFilterChange={(key, value) => setAdvancedFilters(prev => ({ ...prev, [key]: value }))}
         />
         
         <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
@@ -133,6 +153,7 @@ export default function Home() {
           />
           
           <div className="flex items-center gap-4">
+            <RandomVideo videos={filteredVideos} onVideoSelect={openModal} />
             <SortOptions sortBy={sortBy} onSortChange={setSortBy} />
             <ViewToggle viewMode={viewMode} onViewChange={setViewMode} />
           </div>
@@ -155,6 +176,10 @@ export default function Home() {
                 video={video} 
                 isFavorite={favorites.includes(video.id)}
                 onToggleFavorite={toggleFavorite}
+                isInWatchLater={watchLater.includes(video.id)}
+                onToggleWatchLater={toggleWatchLater}
+                videoRating={ratings[video.id] || 0}
+                onRateVideo={rateVideo}
                 onOpenModal={openModal}
                 viewMode={viewMode}
               />

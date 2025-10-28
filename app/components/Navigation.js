@@ -11,6 +11,7 @@ export default function Navigation() {
     { href: '/', label: 'Home', icon: '🏠' },
     { href: '/categories', label: 'Categories', icon: '📂' },
     { href: '/favorites', label: 'Favorites', icon: '❤️' },
+    { href: '/watch-later', label: 'Watch Later', icon: '⏰' },
     { href: '/trending', label: 'Trending', icon: '🔥' },
     { href: '/about', label: 'About', icon: 'ℹ️' }
   ];
