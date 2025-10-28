@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import ThemeToggle from './ThemeToggle';
 import Navigation from './Navigation';
 
 export default function Header({ showFavoritesOnly, onToggleFavoritesOnly, favoritesCount }) {
@@ -33,7 +32,6 @@ export default function Header({ showFavoritesOnly, onToggleFavoritesOnly, favor
                   Favorites ({favoritesCount || 0})
                 </button>
               )}
-              <ThemeToggle />
             </div>
           </div>
         </div>
