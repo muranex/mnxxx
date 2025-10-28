@@ -16,11 +16,11 @@ export default function VideoModal({ video, isOpen, onClose }) {
   if (!isOpen || !video) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75" onClick={onClose}>
-      <div className="relative w-full max-w-4xl mx-4" onClick={(e) => e.stopPropagation()}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75 p-4" onClick={onClose}>
+      <div className="relative w-full max-w-4xl" onClick={(e) => e.stopPropagation()}>
         <button
           onClick={onClose}
-          className="absolute -top-10 right-0 text-white hover:text-gray-300 text-2xl"
+          className="absolute -top-8 sm:-top-10 right-0 text-white hover:text-gray-300 text-xl sm:text-2xl z-10"
         >
           ✕
         </button>
@@ -34,9 +34,9 @@ export default function VideoModal({ video, isOpen, onClose }) {
               allowFullScreen
             />
           </div>
-          <div className="p-4">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{video.title}</h2>
-            <p className="text-gray-600 dark:text-gray-300 mb-2">{video.description}</p>
+          <div className="p-3 sm:p-4">
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mb-2">{video.title}</h2>
+            <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 mb-2">{video.description}</p>
             <span className="inline-block px-3 py-1 bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 rounded-full text-sm capitalize">
               {video.category}
             </span>

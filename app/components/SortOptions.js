@@ -5,7 +5,7 @@ export default function SortOptions({ sortBy, onSortChange }) {
       <select
         value={sortBy}
         onChange={(e) => onSortChange(e.target.value)}
-        className="px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500"
+        className="px-2 sm:px-3 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-red-500"
       >
         <option value="default">Default</option>
         <option value="title">Title A-Z</option>

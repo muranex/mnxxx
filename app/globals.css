@@ -75,6 +75,21 @@ html {
   background: linear-gradient(45deg, #dc2626, #db2777);
 }
 
+/* Mobile responsive utilities */
+@media (max-width: 475px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+/* Extra small screens */
+@screen xs {
+  .xs\:grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 /* Hot animations */
 @keyframes pulse-hot {
   0%, 100% { transform: scale(1); }

@@ -1,9 +1,9 @@
 export default function CategoryFilter({ categories, activeCategory, onCategoryChange }) {
   return (
-    <div className="flex gap-2 mb-6 overflow-x-auto">
+    <div className="flex flex-wrap gap-2 overflow-x-auto pb-2">
       <button
         onClick={() => onCategoryChange('all')}
-        className={`px-4 py-2 rounded-full whitespace-nowrap ${
+        className={`px-3 py-2 rounded-full whitespace-nowrap text-sm ${
           activeCategory === 'all'
             ? 'bg-red-600 text-white'
             : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
@@ -15,7 +15,7 @@ export default function CategoryFilter({ categories, activeCategory, onCategoryC
         <button
           key={category}
           onClick={() => onCategoryChange(category)}
-          className={`px-4 py-2 rounded-full whitespace-nowrap capitalize ${
+          className={`px-3 py-2 rounded-full whitespace-nowrap capitalize text-sm ${
             activeCategory === category
               ? 'bg-red-600 text-white'
               : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'

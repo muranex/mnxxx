@@ -125,7 +125,7 @@ export default function Home() {
         
         <RecentlyViewed videos={recentlyViewed} onVideoClick={openModal} />
         
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
           <Stats 
             totalVideos={videos.length}
             filteredVideos={filteredVideos.length}
@@ -145,14 +145,14 @@ export default function Home() {
           onFilterChange={(key, value) => setAdvancedFilters(prev => ({ ...prev, [key]: value }))}
         />
         
-        <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+        <div className="space-y-4 mb-6">
           <CategoryFilter
             categories={categories}
             activeCategory={activeCategory}
             onCategoryChange={setActiveCategory}
           />
           
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-4">
             <RandomVideo videos={filteredVideos} onVideoSelect={openModal} />
             <SortOptions sortBy={sortBy} onSortChange={setSortBy} />
             <ViewToggle viewMode={viewMode} onViewChange={setViewMode} />
@@ -167,7 +167,7 @@ export default function Home() {
           </div>
         ) : (
           <div className={viewMode === 'grid' 
-            ? "grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4"
+            ? "grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 sm:gap-4"
             : "space-y-4"
           }>
             {filteredVideos.map((video) => (
