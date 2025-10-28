@@ -152,7 +152,3 @@ export default {
   },
   ]
 };
-
-
-
-<iframe src="https://www.pornhub.com/embed/67fc7c767babe" frameborder="0" width="560" height="315" scrolling="no" allowfullscreen></iframe>
