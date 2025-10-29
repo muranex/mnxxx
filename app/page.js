@@ -15,6 +15,7 @@ import QuickActions from './components/QuickActions';
 import HotBanner from './components/HotBanner';
 import RandomVideo from './components/RandomVideo';
 import AdvancedFilters from './components/AdvancedFilters';
+import Pagination from './components/Pagination';
 import { useFavorites } from './components/Favorites';
 import { useWatchLater } from './components/WatchLater';
 import { useVideoRatings } from './components/VideoRating';
@@ -33,6 +34,8 @@ export default function Home() {
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const [loading, setLoading] = useState(true);
   const [advancedFilters, setAdvancedFilters] = useState({});
+  const [currentPage, setCurrentPage] = useState(1);
+  const [videosPerPage, setVideosPerPage] = useState(20);
   const { favorites, toggleFavorite, clearFavorites } = useFavorites();
   const { recentlyViewed, addToRecentlyViewed, clearRecentlyViewed } = useRecentlyViewed();
   const { watchLater, toggleWatchLater } = useWatchLater();
@@ -91,7 +94,13 @@ export default function Home() {
     }
 
     setFilteredVideos(filtered);
+    setCurrentPage(1); // Reset to first page when filters change
   }, [activeCategory, videos, searchTerm, sortBy, showFavoritesOnly, favorites]);
+
+  // Calculate pagination
+  const totalPages = Math.ceil(filteredVideos.length / videosPerPage);
+  const startIndex = (currentPage - 1) * videosPerPage;
+  const paginatedVideos = filteredVideos.slice(startIndex, startIndex + videosPerPage);
 
   const openModal = (video) => {
     setSelectedVideo(video);
@@ -154,6 +163,19 @@ export default function Home() {
           
           <div className="flex flex-wrap items-center gap-2 sm:gap-4">
             <RandomVideo videos={filteredVideos} onVideoSelect={openModal} />
+            <select
+              value={videosPerPage}
+              onChange={(e) => {
+                setVideosPerPage(Number(e.target.value));
+                setCurrentPage(1);
+              }}
+              className="px-2 py-1 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded"
+            >
+              <option value={20}>20 per page</option>
+              <option value={40}>40 per page</option>
+              <option value={60}>60 per page</option>
+              <option value={100}>100 per page</option>
+            </select>
             <SortOptions sortBy={sortBy} onSortChange={setSortBy} />
             <ViewToggle viewMode={viewMode} onViewChange={setViewMode} />
           </div>
@@ -170,7 +192,7 @@ export default function Home() {
             ? "grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 sm:gap-4"
             : "space-y-4"
           }>
-            {filteredVideos.map((video) => (
+            {paginatedVideos.map((video) => (
               <VideoCard 
                 key={video.id} 
                 video={video} 
@@ -188,8 +210,14 @@ export default function Home() {
         )}
         
         <div className="mt-8 text-center text-sm text-gray-500 dark:text-gray-400">
-          Showing {filteredVideos.length} of {videos.length} videos
+          Showing {startIndex + 1}-{Math.min(startIndex + videosPerPage, filteredVideos.length)} of {filteredVideos.length} videos ({videos.length} total)
         </div>
+        
+        <Pagination 
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+        />
       </div>
       
       <VideoModal 

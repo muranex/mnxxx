@@ -39,3 +39,13 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# large database files
+pornhub.com-db.csv
+pornhub-db.zip
+*.csv
+*.zip
+
+# generated data files
+app/data/videos-expanded.js
+app/data/videos-large.js
