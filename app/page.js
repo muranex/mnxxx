@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import VideoCard from './components/VideoCard';
 import CategoryFilter from './components/CategoryFilter';
 import SearchBar from './components/SearchBar';
@@ -23,35 +23,63 @@ import videosData from './data/videos.js';
 
 export default function Home() {
   const [videos, setVideos] = useState([]);
-  const [filteredVideos, setFilteredVideos] = useState([]);
-  const [activeCategory, setActiveCategory] = useState('all');
+  const [activeCategory, setActiveCategory] = useState(() => 
+    typeof window !== 'undefined' ? localStorage.getItem('activeCategory') || 'all' : 'all'
+  );
   const [categories, setCategories] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [sortBy, setSortBy] = useState('default');
-  const [viewMode, setViewMode] = useState('grid');
+  const [sortBy, setSortBy] = useState(() => 
+    typeof window !== 'undefined' ? localStorage.getItem('sortBy') || 'default' : 'default'
+  );
+  const [viewMode, setViewMode] = useState(() => 
+    typeof window !== 'undefined' ? localStorage.getItem('viewMode') || 'grid' : 'grid'
+  );
   const [selectedVideo, setSelectedVideo] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const [loading, setLoading] = useState(true);
   const [advancedFilters, setAdvancedFilters] = useState({});
   const [currentPage, setCurrentPage] = useState(1);
-  const [videosPerPage, setVideosPerPage] = useState(20);
+  const [videosPerPage, setVideosPerPage] = useState(() => 
+    typeof window !== 'undefined' ? Number(localStorage.getItem('videosPerPage')) || 20 : 20
+  );
   const { favorites, toggleFavorite, clearFavorites } = useFavorites();
   const { recentlyViewed, addToRecentlyViewed, clearRecentlyViewed } = useRecentlyViewed();
   const { watchLater, toggleWatchLater } = useWatchLater();
   const { ratings, rateVideo } = useVideoRatings();
 
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedVideo(null);
+  };
+
+  // Handle browser back button for modal
+  useEffect(() => {
+    const handlePopState = () => {
+      if (isModalOpen) {
+        closeModal();
+        window.history.pushState(null, '', window.location.href);
+      }
+    };
+
+    if (isModalOpen) {
+      window.history.pushState(null, '', window.location.href);
+      window.addEventListener('popstate', handlePopState);
+    }
+
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [isModalOpen]);
+
   useEffect(() => {
     setTimeout(() => {
       setVideos(videosData.videos);
-      setFilteredVideos(videosData.videos);
       const uniqueCategories = [...new Set(videosData.videos.map(video => video.category))];
       setCategories(uniqueCategories);
       setLoading(false);
     }, 500);
   }, []);
 
-  useEffect(() => {
+  const filteredVideos = useMemo(() => {
     let filtered = videos;
 
     // Filter by favorites
@@ -93,9 +121,10 @@ export default function Home() {
         break;
     }
 
-    setFilteredVideos(filtered);
-    setCurrentPage(1); // Reset to first page when filters change
-  }, [activeCategory, videos, searchTerm, sortBy, showFavoritesOnly, favorites]);
+    return filtered;
+  }, [activeCategory, videos, searchTerm, sortBy, showFavoritesOnly, favorites, advancedFilters, ratings]);
+
+
 
   // Calculate pagination
   const totalPages = Math.ceil(filteredVideos.length / videosPerPage);
@@ -106,11 +135,6 @@ export default function Home() {
     setSelectedVideo(video);
     setIsModalOpen(true);
     addToRecentlyViewed(video);
-  };
-
-  const closeModal = () => {
-    setIsModalOpen(false);
-    setSelectedVideo(null);
   };
 
   if (loading) {
@@ -125,12 +149,18 @@ export default function Home() {
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <Header 
         showFavoritesOnly={showFavoritesOnly}
-        onToggleFavoritesOnly={() => setShowFavoritesOnly(!showFavoritesOnly)}
+        onToggleFavoritesOnly={() => {
+          setShowFavoritesOnly(!showFavoritesOnly);
+          setCurrentPage(1);
+        }}
         favoritesCount={favorites.length}
       />
       
       <div className="container mx-auto px-4 py-8">
-        <SearchBar searchTerm={searchTerm} onSearchChange={setSearchTerm} />
+        <SearchBar searchTerm={searchTerm} onSearchChange={(term) => {
+          setSearchTerm(term);
+          setCurrentPage(1);
+        }} />
         
         <RecentlyViewed videos={recentlyViewed} onVideoClick={openModal} />
         
@@ -151,14 +181,21 @@ export default function Home() {
         
         <AdvancedFilters 
           filters={advancedFilters}
-          onFilterChange={(key, value) => setAdvancedFilters(prev => ({ ...prev, [key]: value }))}
+          onFilterChange={(key, value) => {
+            setAdvancedFilters(prev => ({ ...prev, [key]: value }));
+            setCurrentPage(1);
+          }}
         />
         
         <div className="space-y-4 mb-6">
           <CategoryFilter
             categories={categories}
             activeCategory={activeCategory}
-            onCategoryChange={setActiveCategory}
+            onCategoryChange={(category) => {
+              setActiveCategory(category);
+              setCurrentPage(1);
+              localStorage.setItem('activeCategory', category);
+            }}
           />
           
           <div className="flex flex-wrap items-center gap-2 sm:gap-4">
@@ -166,8 +203,10 @@ export default function Home() {
             <select
               value={videosPerPage}
               onChange={(e) => {
-                setVideosPerPage(Number(e.target.value));
+                const value = Number(e.target.value);
+                setVideosPerPage(value);
                 setCurrentPage(1);
+                localStorage.setItem('videosPerPage', value.toString());
               }}
               className="px-2 py-1 text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded"
             >
@@ -176,8 +215,15 @@ export default function Home() {
               <option value={60}>60 per page</option>
               <option value={100}>100 per page</option>
             </select>
-            <SortOptions sortBy={sortBy} onSortChange={setSortBy} />
-            <ViewToggle viewMode={viewMode} onViewChange={setViewMode} />
+            <SortOptions sortBy={sortBy} onSortChange={(sort) => {
+              setSortBy(sort);
+              setCurrentPage(1);
+              localStorage.setItem('sortBy', sort);
+            }} />
+            <ViewToggle viewMode={viewMode} onViewChange={(view) => {
+              setViewMode(view);
+              localStorage.setItem('viewMode', view);
+            }} />
           </div>
         </div>
         
