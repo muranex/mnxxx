@@ -1,17 +1,22 @@
 'use client';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function VideoModal({ video, isOpen, onClose }) {
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
+
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
+      setIsLoading(true);
+      setHasError(false);
     } else {
       document.body.style.overflow = 'unset';
     }
     return () => {
       document.body.style.overflow = 'unset';
     };
-  }, [isOpen]);
+  }, [isOpen, video]);
 
   if (!isOpen || !video) return null;
 
@@ -25,14 +30,31 @@ export default function VideoModal({ video, isOpen, onClose }) {
           ✕
         </button>
         <div className="bg-white dark:bg-gray-800 rounded-lg overflow-hidden">
-          <div className="aspect-video">
-            <iframe
-              src={video.src}
-              title={video.title}
-              className="w-full h-full"
-              allow="fullscreen"
-              allowFullScreen
-            />
+          <div className="aspect-video relative">
+            {isLoading && (
+              <div className="absolute inset-0 flex items-center justify-center bg-gray-100 dark:bg-gray-700">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-500"></div>
+              </div>
+            )}
+            {hasError ? (
+              <div className="absolute inset-0 flex items-center justify-center bg-gray-100 dark:bg-gray-700">
+                <p className="text-gray-500">Failed to load video</p>
+              </div>
+            ) : (
+              <iframe
+                src={video.src}
+                title={video.title}
+                className="w-full h-full"
+                allow="fullscreen"
+                allowFullScreen
+                loading="lazy"
+                onLoad={() => setIsLoading(false)}
+                onError={() => {
+                  setIsLoading(false);
+                  setHasError(true);
+                }}
+              />
+            )}
           </div>
           <div className="p-3 sm:p-4">
             <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white mb-2">{video.title}</h2>
